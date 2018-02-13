@@ -8,7 +8,6 @@ const video2frames = (inputFile, outputFolder) => {
     if (!fs.existsSync(framesOutputFolder)) {
       fs.mkdirSync(framesOutputFolder);
     }
-    const workingDir = process.cwd();
     const cmd = [
       'ffmpeg',
       '-loglevel warning',

@@ -22,6 +22,7 @@ const audio2spectrogram = (inputFile, outputFile) => {
     // Retrieve spectrogram remotely
     rpc.Run({input: audio}, (err, response) => {
       if (err) {
+        rpc.close();
         reject(err);
         return;
       }

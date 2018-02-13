@@ -8,7 +8,6 @@ const video2audio = (inputFile, outputFolder) => {
     if (!fs.existsSync(audioOutputFolder)) {
       fs.mkdirSync(audioOutputFolder);
     }
-    const workingDir = process.cwd();
     const outputFile = path.join(audioOutputFolder, 'mono.wav');
     const cmd = [
       'ffmpeg',

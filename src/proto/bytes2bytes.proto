@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+// The service definition.
+service Bytes2Bytes {
+  rpc Run (Bytes2BytesRequest) returns (Bytes2BytesReply) {}
+}
+
+// The request message.
+message Bytes2BytesRequest {
+  bytes input = 1;
+}
+
+// The response message.
+message Bytes2BytesReply {
+  bytes output = 1;
+}

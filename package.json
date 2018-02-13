@@ -1,0 +1,19 @@
+{
+  "name": "prepro",
+  "version": "0.0.1",
+  "description": "CLI for prepro",
+  "preferGlobal": true,
+  "bin": "./src/prepro.js",
+  "main": "./src/prepro.js",
+  "author": "Cyril Diagne (diagne.cyril@gmail.com)",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@google-cloud/storage": "^1.5.2",
+    "colors": "^1.1.2",
+    "commander": "^2.14.1",
+    "grpc": "^1.9.0",
+    "inquirer": "^5.1.0",
+    "mongoose": "^5.0.4"
+  }
+}

@@ -27,9 +27,9 @@ const frames2colors = (inputFolder, outputFolder) => {
           fs.writeFileSync(path.join(outputFolder, 'colors.json'), json);
           resolve();
         })
-        .catch(err) => {
-      reject(err);
-    };
+        .catch((err) => {
+          reject(err);
+        });
   });
 };
 

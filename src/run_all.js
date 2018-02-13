@@ -18,32 +18,32 @@ function ensurePath(path) {
 }
 
 const runAll = (inputFile, outputFolder) => {
-  console.log(`Running prepro pipeline on ${inputFile.underline}`.bold);
+  console.log(`Running prepro on ${inputFile.underline}`.bold);
   const frames = path.join(outputFolder, 'frames');
   new Promise((resolve) => resolve())
       // Video > Frames
-      // .then(() => {
-      //   console.log('➜ '.bold.blue, 'Extracting Frames'.white);
-      //   return video2frames(inputFile, outputFolder);
-      // })
       .then(() => {
-        console.log('➜ '.bold.blue, 'Extracting colors'.white);
+        console.log('➜ '.bold.blue, 'Extracting Frames'.white);
+        return video2frames(inputFile, outputFolder);
+      })
+      .then(() => {
+        console.log('➜ '.bold.blue, 'Extracting Colors'.white);
         const folder = path.join(outputFolder, 'colors');
         return frames2colors(frames, ensurePath(folder));
       })
-      // // Video > Audio
-      // .then(() => {
-      //   console.log('➜ '.bold.blue, 'Extracting Audio');
-      //   return video2audio(inputFile, outputFolder);
-      // })
-      // // Audio > Spectrogram
-      // .then((audioFile) => {
-      //   console.log('➜ '.bold.blue, 'Extracting Audio Spectrogram');
-      //   const folder = path.join(outputFolder, 'spectrogram');
-      //   const outputFile = path.join(ensurePath(folder), 'spectrogram.png');
-      //   return audio2spectrogram(audioFile, outputFile);
-      // })
-      // .then(() => image2captions(frames, outputFolder))
+      // Video > Audio
+      .then(() => {
+        console.log('➜ '.bold.blue, 'Extracting Audio');
+        return video2audio(inputFile, outputFolder);
+      })
+      // Audio > Spectrogram
+      .then((audioFile) => {
+        console.log('➜ '.bold.blue, 'Extracting Audio Spectrogram');
+        const folder = path.join(outputFolder, 'spectrogram');
+        const outputFile = path.join(ensurePath(folder), 'spectrogram.png');
+        return audio2spectrogram(audioFile, outputFile);
+      })
+      .then(() => image2captions(frames, outputFolder))
       .then(() => console.log('✓ Prepro Pipeline complete!'.bold.green))
       .catch((err) => {
         console.error('✖ Prepro Local Run ERROR'.bold.red);

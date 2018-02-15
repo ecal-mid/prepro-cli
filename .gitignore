@@ -1,3 +1,4 @@
 config/gcloud-key.json
 node_modules
 yarn.lock
+config/config-dev.json

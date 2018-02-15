@@ -1,6 +1,9 @@
 const path = require('path');
 
-const configPath = path.join(__dirname, '..', 'config', 'config.json');
-const config = require(configPath);
+const config = (filename) => {
+  const configPath = path.join(__dirname, '..', 'config', filename);
+  const cfg = require(configPath);
+  return cfg;
+};
 
 module.exports = config;

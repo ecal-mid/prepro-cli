@@ -1,6 +1,7 @@
 {
   "host": "10.192.250.140",
   "services_port": {
-    "audio2spectrogram": 30001
+    "audio2spectrogram": 30001,
+    "video2openpose": 30002
   }
 }

@@ -1,5 +1,5 @@
 ## prepro-cli
-cyril.diagne [at] ecal.ch
+Maintainer: cyril.diagne [at] ecal.ch
 
 A CLI to run the video preprocessing pipeline of the spring 2018 creative coding course at [ECAL](http://ecal.ch).
 
@@ -32,26 +32,29 @@ yarn link
 
 To run the full pipeline on a video, simply run:
 ```
-prepro run <video.mov> <output_folder>
+prepro run <video.mov> <output_folder> [options]
 ```
+**Options:**
+- `-c` or `--config` : load a specific config file
+- `-s` or `--service` : only run a specific service
 
-Your `<output_folder>` should now contain the following subfolders:
+After the pipeline is complete, the `<output_folder>` will contain the following subfolders:
 ```
 .
 +- audio
 +- colors
 +- frames
++- openpose
 +- spectrogram
 ```
 
-
-⚠️   Some transformations only while connected to ECALNET.
+⚠️  ** Some services only while connected to ECALNET. **
 
 Currently available transformations:
 - ✓ `video ➜ frames`
 - ✓ `video ➜ audio`
 - ✓ `frames ➜ colors`
 - ✓ `audio ➜ spectrogram`
-- ✗ frames ➜ human pose
+- ✓ `frames ➜ human pose`
 - ✗ frames ➜ flow
 - ✗ frames ➜ segmentation masks

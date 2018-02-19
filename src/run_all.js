@@ -46,34 +46,34 @@ const runAll = (inputFile, outputFolder, params) => {
         console.log('● '.bold.blue, '[local]'.bold, 'Extracting Frames'.white);
         return video2frames(inputFile, outputFolder, cfg);
       })
-      // .then(() => {
-      //   console.log('● '.bold.blue, '[local]'.bold, 'Extracting
-      //   Colors'.white); const folder = path.join(outputFolder, 'colors');
-      //   const framesFolder = path.join(outputFolder, 'frames');
-      //   return frames2colors(framesFolder, ensurePath(folder));
-      // })
-      // // Video to Audio
-      // .then(() => {
-      //   console.log('● '.bold.blue, '[local]'.bold, 'Extracting Audio');
-      //   return video2audio(inputFile, outputFolder);
-      // })
-      // // Audio to Spectrogram
-      // .then((audioFile) => {
-      //   console.log(
-      //       '● '.bold.blue, '[remote]'.bold, 'Extracting Audio Spectrogram');
-      //   const folder = path.join(outputFolder, 'spectrogram');
-      //   const outputFile = path.join(ensurePath(folder), 'spectrogram.png');
-      //   return audio2spectrogram(audioFile, outputFile, cfg);
-      // })
-      // // Video to Human Pose
-      // .then(() => {
-      //   console.log(
-      //       '● '.bold.blue, '[remote]'.bold,
-      //       'Extracting Human Pose (this may take several minutes)');
-      //   const folder = path.join(outputFolder, 'openpose');
-      //   const outputFile = path.join(ensurePath(folder), 'openpose.json');
-      //   return video2openpose(inputFile, outputFile, cfg);
-      // })
+      .then(() => {
+        console.log('● '.bold.blue, '[local]'.bold, 'Extracting Colors'.white);
+        const folder = path.join(outputFolder, 'colors');
+        const framesFolder = path.join(outputFolder, 'frames');
+        return frames2colors(framesFolder, ensurePath(folder));
+      })
+      // Video to Audio
+      .then(() => {
+        console.log('● '.bold.blue, '[local]'.bold, 'Extracting Audio');
+        return video2audio(inputFile, outputFolder);
+      })
+      // Audio to Spectrogram
+      .then((audioFile) => {
+        console.log(
+            '● '.bold.blue, '[remote]'.bold, 'Extracting Audio Spectrogram');
+        const folder = path.join(outputFolder, 'spectrogram');
+        const outputFile = path.join(ensurePath(folder), 'spectrogram.png');
+        return audio2spectrogram(audioFile, outputFile, cfg);
+      })
+      // Video to Human Pose
+      .then(() => {
+        console.log(
+            '● '.bold.blue, '[remote]'.bold,
+            'Extracting Human Pose (this may take several minutes)');
+        const folder = path.join(outputFolder, 'openpose');
+        const outputFile = path.join(ensurePath(folder), 'openpose.json');
+        return video2openpose(inputFile, outputFile, cfg);
+      })
       .then(() => {
         console.log(
             '● '.bold.blue, '[remote]'.bold,

@@ -48,13 +48,13 @@ After the pipeline is complete, the `<output_folder>` will contain the following
 +- spectrogram
 ```
 
-⚠️  ** Some services only while connected to ECALNET. **
-
-Currently available transformations:
+Available services:
 - ✓ `video ➜ frames`
 - ✓ `video ➜ audio`
 - ✓ `frames ➜ colors`
+
+Services that only work when connected to **ECALNET**:
 - ✓ `audio ➜ spectrogram`
 - ✓ `frames ➜ human pose`
-- ✗ frames ➜ flow
-- ✗ frames ➜ segmentation masks
+- ✓ `frames ➜ segmentation masks`
+- ✗ frames ➜ flow (WIP)

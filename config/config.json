@@ -2,6 +2,8 @@
   "host": "10.192.250.140",
   "services_port": {
     "audio2spectrogram": 30001,
-    "video2openpose": 30002
+    "video2openpose": 30002,
+    "video2flow": 30003,
+    "image2segmentation": 30004
   }
 }

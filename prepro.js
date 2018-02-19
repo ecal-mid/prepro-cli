@@ -3,6 +3,7 @@
 const program = require('commander');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
+const path = require('path');
 
 const pjson = require('./package.json');
 const runAll = require('./src/run_all');
@@ -17,11 +18,16 @@ program.command('run <video> <output>')
     .option('-c, --config [string]', 'Load custom config file', 'config.json')
     .action((video, output, cmd) => {
       console.log(
-          '-'.bold.blue,
           `\nprepro CLI`.bold,
-          `\nv${pjson.version}`,
-          '\n-'.bold.blue,
+          `\nv${pjson.version}\n`.bold.blue,
       );
+
+      if (!fs.existsSync(video)) {
+        console.error('✖ Prepro ERROR'.bold.red);
+        console.error('file not found:', path.join(process.cwd(), video).bold);
+        process.exit(1);
+      }
+
       if (!fs.existsSync(output)) {
         mkdirp.sync(output);
         console.log(`Creating output folder ${output}`);

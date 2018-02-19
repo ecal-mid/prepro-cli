@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const {exec} = require('child_process');
 
-const video2frames = (inputFile, outputFolder) => {
+const video2frames = (inputFile, outputFolder, cfg) => {
   return new Promise((resolve, reject) => {
     let framesOutputFolder = path.join(outputFolder, 'frames');
     if (!fs.existsSync(framesOutputFolder)) {
@@ -12,9 +12,8 @@ const video2frames = (inputFile, outputFolder) => {
       'ffmpeg',
       '-loglevel warning',
       `-i ${inputFile}`,
-      `-qscale:v 2`,
-      '-r 60',
-      path.join(framesOutputFolder, 'frame-%03d.jpg'),
+      `-r ${cfg.video.framerate}`,
+      path.join(framesOutputFolder, 'frame-%03d.png'),
     ];
     exec(cmd.join(' '), (err, stdout, stderr) => {
       if (err) {

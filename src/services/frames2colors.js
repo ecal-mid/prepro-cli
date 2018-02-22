@@ -6,7 +6,7 @@ const image2colors = (inputFile) => {
   return getColors(inputFile);
 };
 
-const frames2colors = (inputFolder, outputFolder) => {
+const frames2colors = (inputFolder, outputFile) => {
   return new Promise((resolve, reject) => {
     const frames = fs.readdirSync(inputFolder);
     const promises = [];
@@ -16,15 +16,14 @@ const frames2colors = (inputFolder, outputFolder) => {
     }
     Promise.all(promises)
         .then((values) => {
-          const result = {};
+          const result = [];
           for (let i = 0; i < values.length; i++) {
-            const f = frames[i];
             const v = values[i];
-            result[f] = v.map((r) => r.hex());
+            result[i] = v.map((r) => r.hex().slice(1));
           }
           const json = JSON.stringify(result, null, '\t');
           // Save file locally
-          fs.writeFileSync(path.join(outputFolder, 'colors.json'), json);
+          fs.writeFileSync(outputFile, json);
           resolve();
         })
         .catch((err) => {

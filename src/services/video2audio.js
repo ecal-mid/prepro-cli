@@ -2,13 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const {exec} = require('child_process');
 
-const video2audio = (inputFile, outputFolder) => {
+const video2audio = (inputFile, outputFile) => {
   return new Promise((resolve, reject) => {
-    let audioOutputFolder = path.join(outputFolder, 'audio');
-    if (!fs.existsSync(audioOutputFolder)) {
-      fs.mkdirSync(audioOutputFolder);
-    }
-    const outputFile = path.join(audioOutputFolder, 'mono.wav');
     const cmd = [
       'ffmpeg',
       `-i ${inputFile}`,

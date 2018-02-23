@@ -1,7 +1,10 @@
+/* eslint-disable no-unused-vars */
+const colors = require('colors');
+/* eslint-enable no-unused-vars */
+
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
-const colors = require('colors');
 const {exec} = require('child_process');
 
 const config = require('./config');
@@ -21,9 +24,12 @@ function video2kfvideo(inputFile, outputFile, cfg) {
     const cmd = [
       'ffmpeg',
       `-i ${inputFile}`,
-      '-y',                                       // allow overwrite
-      '-c:v libx264',                             // codec
-      `-x264opts keyint=${cfg.video.framerate}`,  // codec options
+      // allow overwrite
+      '-y',
+      // codec
+      '-c:v libx264',
+      // codec options
+      `-x264opts keyint=${cfg.video.framerate}`,
       outputFile,
     ];
     exec(cmd.join(' '), (err, stdout, stderr) => {
@@ -50,7 +56,7 @@ function run(args) {
     const folder = args.output.split('/');
     folder.pop();
     ensurePath(path.join.apply(null, folder));
-    type = args.output.split('.').pop()
+    type = args.output.split('.').pop();
   }
   // save infos
   cfg.video.services.push({
@@ -62,9 +68,11 @@ function run(args) {
 }
 
 function logVideoInfo(info) {
-  console.log(`Video Duration:    ${(info.duration.toFixed(2) + 's').bold}`);
-  console.log(`Video Framerate:   ${(info.framerate.toFixed(2) + 'fps').bold}`);
-  console.log(`Total frames:      ${(info.totalframes + '').bold}`);
+  console.log(`Width:         ${(info.width + 'px').bold}`);
+  console.log(`Height:        ${(info.height + 'px').bold}`);
+  console.log(`Duration:      ${(info.duration.toFixed(2) + 's').bold}`);
+  console.log(`Framerate:     ${(info.framerate.toFixed(2) + 'fps').bold}`);
+  console.log(`Total frames:  ${(info.totalframes + '').bold}`);
   console.log('');
 }
 
@@ -72,9 +80,9 @@ const runAll = (inputFile, outputFolder, params) => {
   outputFolder_ = outputFolder;
 
   cfg = config(params.config);
-  console.log(`Config file:       ${params.config.bold}`);
-  console.log(`Remote tasks url:  ${cfg.host.bold}`);
-  console.log(`Running on:        ${inputFile.bold}`);
+  console.log(`Config file:   ${params.config.bold}`);
+  console.log(`Remote url:    ${cfg.host.bold}`);
+  console.log(`Running on:    ${inputFile.bold}`);
 
   servicesFolder = ensurePath(path.join(outputFolder, 'services'));
 
@@ -86,7 +94,9 @@ const runAll = (inputFile, outputFolder, params) => {
           duration: parseFloat(videoInfos[0]['duration']),
           framerate: parseFloat(videoInfos[0]['r_frame_rate']),
           totalframes: parseInt(videoInfos[0]['nb_frames']),
-          services: []
+          width: parseInt(videoInfos[0]['width']),
+          height: parseInt(videoInfos[0]['height']),
+          services: [],
         };
         logVideoInfo(cfg.video);
       })
@@ -148,7 +158,7 @@ const runAll = (inputFile, outputFolder, params) => {
           input: path.join(servicesFolder, 'frames'),
           output: path.join(servicesFolder, 'segmentation'),
           cfg: cfg,
-          log: 'Extracting Segmentations'
+          log: 'Extracting Segmentations',
         });
       })
       // Frames to Captions

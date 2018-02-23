@@ -4,6 +4,8 @@ const grpc = require('grpc');
 
 const audio2spectrogram = (inputFile, outputFile, params) => {
   return new Promise((resolve, reject) => {
+    console.warn('Spectrogram is computed for 60hz!');
+
     // Retrieve proto definition
     const protoPath =
         path.join(__dirname, '..', '..', 'proto', 'bytes2bytes.proto');
@@ -19,6 +21,7 @@ const audio2spectrogram = (inputFile, outputFile, params) => {
     let audio = fs.readFileSync(inputFile);
 
     // Retrieve spectrogram remotely
+    /* eslint new-cap: 0 */
     rpc.Run({input: audio}, (err, response) => {
       if (err) {
         rpc.close();

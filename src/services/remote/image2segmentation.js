@@ -20,6 +20,7 @@ const getSegmentations = (inputFolder, outputFolder, frames, params) => {
 
       const frameFile = path.join(inputFolder, frames[i]);
       let frame = fs.readFileSync(frameFile);
+      /* eslint new-cap: 0 */
       rpc.Run({input: frame}, (err, response) => {
         if (err) {
           reject(err);

@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const {exec} = require('child_process');
 
 const video2audio = (inputFile, outputFile) => {
@@ -7,8 +5,10 @@ const video2audio = (inputFile, outputFile) => {
     const cmd = [
       'ffmpeg',
       `-i ${inputFile}`,
-      '-y',     // allow overwrite
-      '-ac 1',  // combine to mono channel
+      // allow overwrite
+      '-y',
+      // combine to mono channel
+      '-ac 1',
       outputFile,
     ];
     exec(cmd.join(' '), (err, stdout, stderr) => {

@@ -16,6 +16,7 @@ const getCaptions = (inputFolder, frames) => {
     const getNextCaption = (i) => {
       const frameFile = path.join(inputFolder, frames[i]);
       let frame = fs.readFileSync(frameFile);
+      /* eslint new-cap: 0 */
       rpc.Run({image: frame}, (err, response) => {
         if (err) {
           reject(err);

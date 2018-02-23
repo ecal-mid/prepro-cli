@@ -18,6 +18,7 @@ const video2openpose = (inputFile, outputFile, params) => {
     let video = fs.readFileSync(inputFile);
 
     // Retrieve pose remotely
+    /* eslint new-cap: 0 */
     rpc.Run({input: video}, (err, response) => {
       if (err) {
         rpc.close();

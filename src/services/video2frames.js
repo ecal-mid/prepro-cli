@@ -24,7 +24,7 @@ const run = (inputFile, output, cfg) => {
       `-r ${cfg.video.framerate}`,
       path.join(output, 'frame-%03d.png'),
     ];
-    status = 'running';
+    status = 'processing';
     exec(cmd.join(' '), (err, stdout, stderr) => {
       if (err) {
         status = 'error';

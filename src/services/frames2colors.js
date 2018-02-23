@@ -36,7 +36,7 @@ const run = (inputFolder, output) => {
       return;
     }
 
-    status = 'running';
+    status = 'processing';
     Promise.all(promises)
         .then((values) => {
           const result = [];

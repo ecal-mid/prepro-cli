@@ -25,7 +25,7 @@ const run = (inputFile, output, cfg) => {
       '-ac 1',
       output,
     ];
-    status = 'running';
+    status = 'processing';
     exec(cmd.join(' '), (err, stdout, stderr) => {
       if (err) {
         status = 'error';

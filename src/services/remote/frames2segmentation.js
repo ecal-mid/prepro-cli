@@ -23,7 +23,7 @@ const getSegmentations_ = (inputFolder, outputFolder, frames, url, params) => {
 
   return new Promise((resolve, reject) => {
     const getNextSegmentation = (i) => {
-      status = `Running frame ${i + 1}/${frames.length}`;
+      status = `processing frame ${i + 1}/${frames.length}`;
 
       const frameFile = path.join(inputFolder, frames[i]);
       let frame = fs.readFileSync(frameFile);
@@ -59,7 +59,7 @@ const run = (inputFolder, outputFolder, url, params) => {
     // retrieve frames list
     const frames = fs.readdirSync(inputFolder);
     // infer caption for each frame
-    status = 'running';
+    status = 'processing';
     getSegmentations_(inputFolder, outputFolder, frames, url, params)
         .then(() => {
           status = 'complete';

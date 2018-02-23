@@ -27,7 +27,7 @@ const run = (inputFile, output, cfg) => {
       `-x264opts keyint=${cfg.video.framerate}`,
       output,
     ];
-    status = 'running';
+    status = 'processing';
     exec(cmd.join(' '), (err, stdout, stderr) => {
       if (err) {
         reject(err);

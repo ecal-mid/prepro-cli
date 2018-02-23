@@ -5,12 +5,10 @@ const colors = require('colors');
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
-const {exec} = require('child_process');
-
-const config = require('./config');
-const {getVideoInfo} = require('./utils');
 
 let outputFolder_;
+
+const _ALL_ERRORS_FATAL = true;
 
 function ensurePath(path) {
   if (!fs.existsSync(path)) {
@@ -19,168 +17,158 @@ function ensurePath(path) {
   return path;
 }
 
-function video2kfvideo(inputFile, outputFile, cfg) {
+function logStatus(time, services, clear = true) {
+  if (clear) {
+    const offset = services.length + 1;
+    process.stdout.write(`\x1b[${offset}A`);
+  }
+  process.stdout.write(
+      'Running... '.bold.blue + ((time / 1000).toFixed(2) + 's\n').grey);
+  for (let s of services) {
+    let status = s.getStatus();
+    if (status == 'complete') {
+      status = status.bold.green;
+    } else if (status.indexOf('running') != -1) {
+      const anim = ['⣷', '⣯', '⣟', '⡿', '⢿', '⣻', '⣽', '⣾'];
+      const frame = anim[Math.floor((Date.now()) / 100 % anim.length)];
+      status = (frame + ' ' + status).bold.yellow;
+    } else if (status == 'error') {
+      status = ('✕ ' + status).red;
+    }
+    process.stdout.clearLine();
+    process.stdout.write('- ' + s.id.bold + ': ' + status + '\n');
+  }
+}
+
+function saveInfos(services, cfg) {
+  for (let s of services) {
+    // determine type of output
+    let type;
+    if (s.output.indexOf('.') == -1) {
+      ensurePath(s.output);
+      type = 'frames';
+    } else {
+      const folder = s.output.split('/');
+      folder.pop();
+      ensurePath(path.join.apply(null, folder));
+      type = s.output.split('.').pop();
+    }
+    // save infos
+    cfg.video.services.push({
+      'name': s.id,
+      'path': path.relative(cfg.outputFolder, s.output),
+      'type': type,
+    });
+  }
+
+  console.log('\nSaving summary to', 'prepro.json'.bold);
+  const outputFile = path.join(cfg.outputFolder, 'prepro.json');
+  const file = fs.createWriteStream(outputFile);
+  file.write(JSON.stringify(cfg.video, null, 2));
+  file.end();
+}
+
+function run(service, input, outputFolder, cfg) {
+  if (service.id == 'video2kfvideo') {
+    outputFolder = path.join(outputFolder, '..');
+  } else {
+    outputFolder = path.join(outputFolder, service.id);
+  }
+
+  if (service.id.startsWith('frames2') ||
+      service.id.startsWith('remote/frames2')) {
+    input = path.join(outputFolder, '..', 'video2frames');
+  }
+
+  if (service.id.startsWith('audio2') ||
+      service.id.startsWith('remote/audio2')) {
+    input = path.join(outputFolder, '..', 'video2audio', 'mono.wav');
+  }
+
+  ensurePath(outputFolder);
+  let remoteUrl = service.def.url;
+  if (remoteUrl) {
+    return service.run(input, outputFolder, remoteUrl, cfg);
+  } else {
+    return service.run(input, outputFolder, cfg);
+  }
+}
+
+function runAll(inputFile, outputFolder, cfg) {
+  cfg.outputFolder = outputFolder;
+
+  servicesFolder = ensurePath(path.join(outputFolder, 'prepros'));
+
   return new Promise((resolve, reject) => {
-    const cmd = [
-      'ffmpeg',
-      `-i ${inputFile}`,
-      // allow overwrite
-      '-y',
-      // codec
-      '-c:v libx264',
-      // codec options
-      `-x264opts keyint=${cfg.video.framerate}`,
-      outputFile,
-    ];
-    exec(cmd.join(' '), (err, stdout, stderr) => {
-      if (err) {
-        reject(err);
+    let services = [];
+
+    for (let serviceDef of cfg.services) {
+      const service = require('./' + path.join('services', serviceDef.id));
+      // TODO: we shouldnt create the serviceDef property
+      service.def = serviceDef;
+      services.push(service);
+    }
+
+    let startTime = Date.now();
+
+    const dependencies = ['video2frames', 'video2audio'];
+    const services1 = services.filter((s) => dependencies.indexOf(s.id) != -1);
+    const promises1 =
+        services1.map((s) => run(s, inputFile, servicesFolder, cfg));
+
+    const errors = [];
+
+    let services2;
+
+    Promise.all(promises1)
+        .then((outputs) => {
+          for (let i = 0; i < outputs.length; i++) {
+            services1[i].output = outputs[i];
+          }
+          services2 = services.filter((s) => dependencies.indexOf(s.id) == -1);
+          const promises2 =
+              services2.map((s) => run(s, inputFile, servicesFolder, cfg));
+          return Promise.all(promises2);
+        })
+        .then((outputs) => {
+          for (let i = 0; i < outputs.length; i++) {
+            services2[i].output = outputs[i];
+          }
+          const time = Date.now() - startTime;
+          clearInterval(updateLoop);
+          logStatus(time, services, true, 1);
+          saveInfos(services, cfg);
+          resolve(services);
+        })
+        .catch((err) => {
+          if (_ALL_ERRORS_FATAL) {
+            reject(err);
+          }
+          errors.push(err);
+        });
+
+    // check updates & global timeout
+    logStatus(0, services, false);
+    const updateLoop = setInterval(() => {
+      const time = Date.now() - startTime;
+      logStatus(time, services);
+
+      const pending = services.filter(
+          (s) => s.getStatus().indexOf('complete') == -1 &&
+              s.getStatus().indexOf('error') == -1);
+
+      if (pending.length == 0) {
+        clearInterval(updateLoop);
+        reject(errors);
         return;
       }
-      resolve(outputFile);
-    });
+
+      if (time > 60 * 60 * 1000) {
+        clearInterval(updateLoop);
+        reject(errors.length ? errors : new Error('Prepro timed out.'));
+      }
+    }, 60);
   });
-};
-
-function run(args) {
-  const location = args.service.indexOf('remote') > -1 ? 'remote' : 'local';
-  const log = args.log || `Running ${args.service}`;
-  console.log('● '.bold.blue, `[${location}]`.bold, log);
-  const service = require('./' + path.join('services', args.service));
-  // type of output
-  let type;
-  if (args.output.indexOf('.') == -1) {
-    ensurePath(args.output);
-    type = 'frames';
-  } else {
-    const folder = args.output.split('/');
-    folder.pop();
-    ensurePath(path.join.apply(null, folder));
-    type = args.output.split('.').pop();
-  }
-  // save infos
-  cfg.video.services.push({
-    'name': args.service.split(2).pop(),
-    'path': path.relative(outputFolder_, args.output),
-    'type': type,
-  });
-  return service(args.input, args.output, cfg);
-}
-
-function logVideoInfo(info) {
-  console.log(`Width:         ${(info.width + 'px').bold.blue}`);
-  console.log(`Height:        ${(info.height + 'px').bold.blue}`);
-  console.log(`Duration:      ${(info.duration.toFixed(2) + 's').bold.blue}`);
-  console.log(
-      `Framerate:     ${(info.framerate.toFixed(2) + 'fps').bold.blue}`);
-  console.log(`Total frames:  ${(info.totalframes + '').bold.blue}`);
-  console.log('');
-}
-
-const runAll = (inputFile, outputFolder, params) => {
-  outputFolder_ = outputFolder;
-
-  cfg = config(params.config);
-  console.log(`Config file:   ${params.config.bold.blue}`);
-  console.log(`Remote url:    ${cfg.host.bold.blue}`);
-  console.log(`Running on:    ${inputFile.bold.blue}`);
-
-  servicesFolder = ensurePath(path.join(outputFolder, 'services'));
-
-  // return pipeline Promise
-  return getVideoInfo(inputFile)
-      .then((infos) => {
-        const videoInfos = infos.streams.filter((f) => f.codec_type == 'video');
-        cfg.video = {
-          duration: parseFloat(videoInfos[0]['duration']),
-          framerate: parseFloat(videoInfos[0]['r_frame_rate']),
-          totalframes: parseInt(videoInfos[0]['nb_frames']),
-          width: parseInt(videoInfos[0]['width']),
-          height: parseInt(videoInfos[0]['height']),
-          services: [],
-        };
-        logVideoInfo(cfg.video);
-      })
-      // Video to Frames
-      .then(() => {
-        return run({
-          service: 'video2frames',
-          input: inputFile,
-          output: path.join(servicesFolder, 'frames'),
-          cfg: cfg,
-          log: 'Extracting frames',
-        });
-      })
-      // Video to Audio
-      .then(() => {
-        return run({
-          service: 'video2audio',
-          input: inputFile,
-          output: path.join(servicesFolder, 'audio', 'mono.wav'),
-          cfg: cfg,
-          log: 'Extracting audio',
-        });
-      })
-      // // Frames to color
-      .then(() => {
-        return run({
-          service: 'frames2colors',
-          input: path.join(servicesFolder, 'frames'),
-          output: path.join(servicesFolder, 'colors', 'colors.json'),
-          cfg: cfg,
-          log: 'Extracting colors',
-        });
-      })
-      // Audio to Spectrogram
-      .then(() => {
-        return run({
-          service: 'remote/audio2spectrogram',
-          input: path.join(servicesFolder, 'audio', 'mono.wav'),
-          output: path.join(servicesFolder, 'spectrogram', 'spectrogram.png'),
-          cfg: cfg,
-          log: 'Extracting Audio Spectrogram',
-        });
-      })
-      // Video to Human Pose
-      .then(() => {
-        return run({
-          service: 'remote/video2openpose',
-          input: inputFile,
-          output: path.join(servicesFolder, 'openpose', 'openpose.json'),
-          cfg: cfg,
-          log: 'Extracting Human Pose (this may take several minutes)',
-        });
-      })
-      // Frames to Segmentation Masks
-      .then(() => {
-        return run({
-          service: 'remote/image2segmentation',
-          input: path.join(servicesFolder, 'frames'),
-          output: path.join(servicesFolder, 'segmentation'),
-          cfg: cfg,
-          log: 'Extracting Segmentations',
-        });
-      })
-      // Frames to Captions
-      // .then(() => image2captions(frames, servicesFolder))
-      .then(() => {
-        console.log('\nExporting keyframed video..'.bold);
-        const outputFile = path.join(outputFolder, 'source.mov');
-        return video2kfvideo(inputFile, outputFile, cfg);
-      })
-      .then(() => {
-        console.log('\nSaving summary:', '    prepro.json'.bold);
-        const outputFile = path.join(outputFolder, 'prepro.json');
-        const file = fs.createWriteStream(outputFile);
-        file.write(JSON.stringify(cfg.video, null, 2));
-        file.end();
-      })
-      .then(() => console.log('\n', '✓ Prepro Pipeline complete!\n'.bold.green))
-      .catch((err) => {
-        console.error('\n\n✖ Prepro ERROR\n'.bold.red);
-        console.error(err.stack.red, '\n');
-        process.exit(1);
-      });
 };
 
 module.exports = runAll;

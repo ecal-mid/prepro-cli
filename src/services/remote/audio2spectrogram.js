@@ -2,9 +2,22 @@ const fs = require('fs');
 const path = require('path');
 const grpc = require('grpc');
 
-const audio2spectrogram = (inputFile, outputFile, params) => {
+const id = 'audio2spectrogram';
+const description = 'Extract mono audio track from video';
+
+let status = 'idle';
+
+function getStatus() {
+  return status;
+}
+
+const run = (inputFile, output, url, params) => {
   return new Promise((resolve, reject) => {
-    console.warn('Spectrogram is computed for 60hz!');
+    // TODO: ⚠️ Spectrogram is computed at 60hz!
+
+    if (path.basename(output).indexOf('.') == '-1') {
+      output = path.join(output, 'spectrogram.png');
+    }
 
     // Retrieve proto definition
     const protoPath =
@@ -13,31 +26,42 @@ const audio2spectrogram = (inputFile, outputFile, params) => {
     const Bytes2Bytes = proto.Bytes2Bytes;
 
     // Create stub
-    const rpc = new Bytes2Bytes(
-        params.host + ':' + params.services_port.audio2spectrogram,
-        grpc.credentials.createInsecure());
+    const rpc = new Bytes2Bytes(url, grpc.credentials.createInsecure());
 
     // Load file
     let audio = fs.readFileSync(inputFile);
 
+    status = 'running on ' + url;
     // Retrieve spectrogram remotely
     /* eslint new-cap: 0 */
     rpc.Run({input: audio}, (err, response) => {
       if (err) {
         rpc.close();
+        status = 'error';
         reject(err);
         return;
       }
 
       // Save file locally
-      const file = fs.createWriteStream(outputFile);
-      file.write(response.output);
-      file.end();
+      try {
+        const file = fs.createWriteStream(output);
+        file.write(response.output);
+        file.end();
+      } catch (err) {
+        reject(err);
+      }
+
+      status = 'complete';
 
       // Resolve
-      resolve(outputFile);
+      resolve(output);
     });
   });
 };
 
-module.exports = audio2spectrogram;
+module.exports = {
+  id,
+  description,
+  run,
+  getStatus,
+};

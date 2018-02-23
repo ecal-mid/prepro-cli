@@ -2,26 +2,44 @@ const fs = require('fs');
 const path = require('path');
 const {exec} = require('child_process');
 
-const video2frames = (inputFile, outputFolder, cfg) => {
+const id = 'video2frames';
+
+const description = 'Extract frames from video';
+
+let status = 'idle';
+
+function getStatus() {
+  return status;
+}
+
+const run = (inputFile, output, cfg) => {
   return new Promise((resolve, reject) => {
-    if (!fs.existsSync(outputFolder)) {
-      fs.mkdirSync(outputFolder);
+    if (!fs.existsSync(output)) {
+      fs.mkdirSync(output);
     }
     const cmd = [
       'ffmpeg',
       '-loglevel warning',
       `-i ${inputFile}`,
       `-r ${cfg.video.framerate}`,
-      path.join(outputFolder, 'frame-%03d.png'),
+      path.join(output, 'frame-%03d.png'),
     ];
+    status = 'running';
     exec(cmd.join(' '), (err, stdout, stderr) => {
       if (err) {
+        status = 'error';
         reject(err);
         return;
       }
-      resolve();
+      status = 'complete';
+      resolve(output);
     });
   });
 };
 
-module.exports = video2frames;
+module.exports = {
+  id,
+  description,
+  run,
+  getStatus,
+};

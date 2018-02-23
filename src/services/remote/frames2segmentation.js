@@ -2,7 +2,16 @@ const fs = require('fs');
 const path = require('path');
 const grpc = require('grpc');
 
-const getSegmentations = (inputFolder, outputFolder, frames, params) => {
+const id = 'frames2segmentation';
+const description = 'Extract mono audio track from video';
+
+let status = 'Idle';
+
+function getStatus() {
+  return status;
+}
+
+const getSegmentations_ = (inputFolder, outputFolder, frames, url, params) => {
   // Retrieve proto definition
   const protoPath =
       path.join(__dirname, '..', '..', 'proto', 'bytes2bytes.proto');
@@ -10,16 +19,15 @@ const getSegmentations = (inputFolder, outputFolder, frames, params) => {
   const Bytes2Bytes = proto.Bytes2Bytes;
 
   // Create stub
-  const rpc = new Bytes2Bytes(
-      params.host + ':' + params.services_port.image2segmentation,
-      grpc.credentials.createInsecure());
+  const rpc = new Bytes2Bytes(url, grpc.credentials.createInsecure());
 
   return new Promise((resolve, reject) => {
     const getNextSegmentation = (i) => {
-      process.stdout.write(`➜  Processing frame ${i + 1}/${frames.length}...`);
+      status = `Running frame ${i + 1}/${frames.length}`;
 
       const frameFile = path.join(inputFolder, frames[i]);
       let frame = fs.readFileSync(frameFile);
+
       /* eslint new-cap: 0 */
       rpc.Run({input: frame}, (err, response) => {
         if (err) {
@@ -32,9 +40,6 @@ const getSegmentations = (inputFolder, outputFolder, frames, params) => {
         file.write(response.output);
         file.end();
 
-        process.stdout.clearLine();
-        process.stdout.cursorTo(0);
-
         if (i == frames.length - 1) {
           resolve();
         } else {
@@ -46,7 +51,7 @@ const getSegmentations = (inputFolder, outputFolder, frames, params) => {
   });
 };
 
-const image2segmentation = (inputFolder, outputFolder, params) => {
+const run = (inputFolder, outputFolder, url, params) => {
   return new Promise((resolve, reject) => {
     if (!fs.existsSync(outputFolder)) {
       fs.mkdirSync(outputFolder);
@@ -54,10 +59,19 @@ const image2segmentation = (inputFolder, outputFolder, params) => {
     // retrieve frames list
     const frames = fs.readdirSync(inputFolder);
     // infer caption for each frame
-    getSegmentations(inputFolder, outputFolder, frames, params)
-        .then(resolve)
+    status = 'running';
+    getSegmentations_(inputFolder, outputFolder, frames, url, params)
+        .then(() => {
+          status = 'complete';
+          resolve();
+        })
         .catch(reject);
   });
 };
 
-module.exports = image2segmentation;
+module.exports = {
+  id,
+  description,
+  run,
+  getStatus,
+};

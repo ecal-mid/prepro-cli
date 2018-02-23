@@ -1,9 +1,32 @@
 {
-  "host": "10.192.250.140",
-  "services_port": {
-    "audio2spectrogram": 30001,
-    "video2openpose": 30002,
-    "video2flow": 30003,
-    "image2segmentation": 30004
-  }
+  "services": [
+    {
+      "id": "video2frames"
+    },
+    {
+      "id": "video2audio"
+    },
+    {
+      "id": "video2kfvideo"
+    },
+    {
+      "id": "frames2colors"
+    },
+    {
+      "id": "remote/audio2spectrogram",
+      "url": "10.192.250.140:30001"
+    },
+    {
+      "id": "remote/video2openpose",
+      "url": "10.192.250.140:30002"
+    },
+    {
+      "id": "remote/video2flow",
+      "url": "10.192.250.140:30003"
+    },
+    {
+      "id": "remote/frames2segmentation",
+      "url": "10.192.250.140:30004"
+    }
+  ]
 }

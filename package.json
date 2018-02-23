@@ -6,7 +6,7 @@
   "bin": "./src/prepro.js",
   "main": "./src/prepro.js",
   "author": "Cyril Diagne (diagne.cyril@gmail.com)",
-  "license": "MIT",
+  "license": "GPL",
   "private": true,
   "dependencies": {
     "@google-cloud/storage": "^1.5.2",

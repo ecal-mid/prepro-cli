@@ -1,9 +1,9 @@
 const {exec} = require('child_process');
 const path = require('path');
 
-const id = 'video2audio';
+const id = 'video2kfvideo';
 
-const description = 'Extract mono audio track from video';
+const description = 'Reencode the input video with a keyframe for each frame';
 
 let status = 'idle';
 
@@ -13,7 +13,7 @@ function getStatus() {
 
 const run = (inputFile, output, cfg) => {
   if (path.basename(output).indexOf('.') == '-1') {
-    output = path.join(output, 'mono.wav');
+    output = path.join(output, 'source.mov');
   }
   return new Promise((resolve, reject) => {
     const cmd = [
@@ -21,14 +21,15 @@ const run = (inputFile, output, cfg) => {
       `-i ${inputFile}`,
       // allow overwrite
       '-y',
-      // combine to mono channel
-      '-ac 1',
+      // codec
+      '-c:v libx264',
+      // codec options
+      `-x264opts keyint=${cfg.video.framerate}`,
       output,
     ];
     status = 'running';
     exec(cmd.join(' '), (err, stdout, stderr) => {
       if (err) {
-        status = 'error';
         reject(err);
         return;
       }

@@ -68,11 +68,12 @@ function run(args) {
 }
 
 function logVideoInfo(info) {
-  console.log(`Width:         ${(info.width + 'px').bold}`);
-  console.log(`Height:        ${(info.height + 'px').bold}`);
-  console.log(`Duration:      ${(info.duration.toFixed(2) + 's').bold}`);
-  console.log(`Framerate:     ${(info.framerate.toFixed(2) + 'fps').bold}`);
-  console.log(`Total frames:  ${(info.totalframes + '').bold}`);
+  console.log(`Width:         ${(info.width + 'px').bold.blue}`);
+  console.log(`Height:        ${(info.height + 'px').bold.blue}`);
+  console.log(`Duration:      ${(info.duration.toFixed(2) + 's').bold.blue}`);
+  console.log(
+      `Framerate:     ${(info.framerate.toFixed(2) + 'fps').bold.blue}`);
+  console.log(`Total frames:  ${(info.totalframes + '').bold.blue}`);
   console.log('');
 }
 
@@ -80,9 +81,9 @@ const runAll = (inputFile, outputFolder, params) => {
   outputFolder_ = outputFolder;
 
   cfg = config(params.config);
-  console.log(`Config file:   ${params.config.bold}`);
-  console.log(`Remote url:    ${cfg.host.bold}`);
-  console.log(`Running on:    ${inputFile.bold}`);
+  console.log(`Config file:   ${params.config.bold.blue}`);
+  console.log(`Remote url:    ${cfg.host.bold.blue}`);
+  console.log(`Running on:    ${inputFile.bold.blue}`);
 
   servicesFolder = ensurePath(path.join(outputFolder, 'services'));
 
@@ -102,13 +103,12 @@ const runAll = (inputFile, outputFolder, params) => {
       })
       // Video to Frames
       .then(() => {
-        const framesFolder = path.join(servicesFolder, 'frames');
         return run({
           service: 'video2frames',
           input: inputFile,
           output: path.join(servicesFolder, 'frames'),
           cfg: cfg,
-          log: 'Extracting frames'
+          log: 'Extracting frames',
         });
       })
       // Video to Audio
@@ -118,7 +118,7 @@ const runAll = (inputFile, outputFolder, params) => {
           input: inputFile,
           output: path.join(servicesFolder, 'audio', 'mono.wav'),
           cfg: cfg,
-          log: 'Extracting audio'
+          log: 'Extracting audio',
         });
       })
       // // Frames to color
@@ -128,7 +128,7 @@ const runAll = (inputFile, outputFolder, params) => {
           input: path.join(servicesFolder, 'frames'),
           output: path.join(servicesFolder, 'colors', 'colors.json'),
           cfg: cfg,
-          log: 'Extracting colors'
+          log: 'Extracting colors',
         });
       })
       // Audio to Spectrogram
@@ -138,7 +138,7 @@ const runAll = (inputFile, outputFolder, params) => {
           input: path.join(servicesFolder, 'audio', 'mono.wav'),
           output: path.join(servicesFolder, 'spectrogram', 'spectrogram.png'),
           cfg: cfg,
-          log: 'Extracting Audio Spectrogram'
+          log: 'Extracting Audio Spectrogram',
         });
       })
       // Video to Human Pose
@@ -148,7 +148,7 @@ const runAll = (inputFile, outputFolder, params) => {
           input: inputFile,
           output: path.join(servicesFolder, 'openpose', 'openpose.json'),
           cfg: cfg,
-          log: 'Extracting Human Pose (this may take several minutes)'
+          log: 'Extracting Human Pose (this may take several minutes)',
         });
       })
       // Frames to Segmentation Masks
@@ -177,8 +177,8 @@ const runAll = (inputFile, outputFolder, params) => {
       })
       .then(() => console.log('\n', '✓ Prepro Pipeline complete!\n'.bold.green))
       .catch((err) => {
-        console.error('\n', '✖ Prepro ERROR'.bold.red);
-        console.error(err);
+        console.error('\n\n✖ Prepro ERROR\n'.bold.red);
+        console.error(err.stack.red, '\n');
         process.exit(1);
       });
 };

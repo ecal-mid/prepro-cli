@@ -56,9 +56,7 @@ const image2segmentation = (inputFolder, outputFolder, params) => {
     // infer caption for each frame
     getSegmentations(inputFolder, outputFolder, frames, params)
         .then(resolve)
-        .catch((err) => {
-          console.error('ERROR:', err);
-        });
+        .catch(reject);
   });
 };
 

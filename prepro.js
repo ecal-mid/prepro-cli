@@ -17,7 +17,10 @@ program.command('run <video> <output>')
     .option('-s, --service [string]', 'Only run the given service')
     .option('-c, --config [string]', 'Load custom config file', 'config.json')
     .action((video, output, cmd) => {
-      console.log(`\nprepro CLI`.bold, `\nv${pjson.version}\n`.bold.blue);
+      console.log(
+          '\n➜ ➜ ➜ ➜ ➜ ➜ ➜ ➜ ➜ ➜ ➜ ➜ ➜'.bold.blue, '\n➜ '.bold.blue,
+          `prepro CLI`.bold, `- v${pjson.version} `, '➜ '.bold.blue,
+          '\n➜ ➜ ➜ ➜ ➜ ➜ ➜ ➜ ➜ ➜ ➜ ➜ ➜'.bold.blue, '\n');
 
       if (!fs.existsSync(video)) {
         console.error('✖ Prepro ERROR'.bold.red);

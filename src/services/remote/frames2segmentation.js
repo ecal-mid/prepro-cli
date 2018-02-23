@@ -63,7 +63,7 @@ const run = (inputFolder, outputFolder, url, params) => {
     getSegmentations_(inputFolder, outputFolder, frames, url, params)
         .then(() => {
           status = 'complete';
-          resolve();
+          resolve(outputFolder);
         })
         .catch(reject);
   });

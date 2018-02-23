@@ -17,10 +17,7 @@ program.command('run <video> <output>')
     .option('-s, --service [string]', 'Only run the given service')
     .option('-c, --config [string]', 'Load custom config file', 'config.json')
     .action((video, output, cmd) => {
-      console.log(
-          `\nprepro CLI`.bold,
-          `\nv${pjson.version}\n`.bold.blue,
-      );
+      console.log(`\nprepro CLI`.bold, `\nv${pjson.version}\n`.bold.blue);
 
       if (!fs.existsSync(video)) {
         console.error('✖ Prepro ERROR'.bold.red);
@@ -33,7 +30,7 @@ program.command('run <video> <output>')
         console.log(`Creating output folder ${output}`);
       }
       if (cmd.service) {
-        console.log('not supported yet.')
+        console.log('not supported yet.');
       } else {
         runAll(video, output, cmd);
       }

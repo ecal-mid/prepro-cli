@@ -10,7 +10,7 @@ let status = 'idle';
 
 let totalFrames = 0;
 
-const numParallel = 20;
+const numParallel = 10;
 
 function getStatus() {
   return status;
@@ -101,10 +101,16 @@ const run = (inputFolder, outputFolder, url, params) => {
     // retrieve frames list
     const frames = fs.readdirSync(inputFolder);
     totalFrames = frames.length;
-    const length = Math.ceil(frames.length / numParallel) + 1;
+    const length = frames.length / numParallel;
     const promises = [];
     while (frames.length) {
       const slice = frames.splice(0, length);
+      if (frames.length) {
+        slice.push(frames[0]);
+      }
+      if (frames.length == 1) {
+        frames.push(frames[0]);
+      }
       const p = getFlow_(inputFolder, outputFolder, slice, url, params);
       promises.push(p);
     }

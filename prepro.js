@@ -31,13 +31,14 @@ program.command('run <video> <output>')
 program.parse(process.argv);
 
 function logVideoInfo(info, format) {
-  console.log(`  Format:       ${format.format_long_name}`);
-  console.log(`  Size:         ${info.size.toFixed(2) + 'mb'}`);
-  console.log(`  Width:        ${info.width + 'px'}`);
-  console.log(`  Height:       ${info.height + 'px'}`);
-  console.log(`  Duration:     ${info.duration.toFixed(2) + 's'}`);
-  console.log(`  Framerate:    ${info.framerate.toFixed(2) + 'fps'}`);
-  console.log(`  Total frames: ${info.totalframes + ''}`);
+  const pad = (s) => '  ' + s.padEnd(13).grey;
+  console.log(pad('Format'), format.format_long_name);
+  console.log(pad('Size'), info.size.toFixed(2) + 'mb');
+  console.log(pad('Width'), info.width + 'px');
+  console.log(pad('Height'), info.height + 'px');
+  console.log(pad('Duration'), info.duration.toFixed(2) + 's');
+  console.log(pad('Framerate'), info.framerate.toFixed(2) + 'fps');
+  console.log(pad('Total frames'), info.totalframes + '');
   console.log('');
 }
 

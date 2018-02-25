@@ -33,8 +33,10 @@ function logStatus(time, services, clear = true) {
     } else if (status == 'error') {
       status = ('✕ ' + status).red;
     }
+    let outputName = s.id.split('2').pop();
+    outputName = '  ' + outputName.padEnd(14);
     process.stdout.clearLine();
-    process.stdout.write('- ' + s.id.bold + ': ' + status + '\n');
+    process.stdout.write(outputName + status + '\n');
   }
 }
 

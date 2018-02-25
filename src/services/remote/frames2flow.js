@@ -8,6 +8,10 @@ const description = 'Extract optical flow from video';
 
 let status = 'idle';
 
+let totalFrames = 0;
+
+const numParallel = 20;
+
 function getStatus() {
   return status;
 }
@@ -24,7 +28,9 @@ const getFlow_ = (inputFolder, outputFolder, frames, url, params) => {
 
   return new Promise((resolve, reject) => {
     const getNextFlow = (i) => {
-      status = `processing frame ${i + 1}/${frames.length}`;
+      const a = i * numParallel;
+      const b = (i + 1) * numParallel;
+      status = `processing frames ${a}-${b}/${totalFrames}`;
 
       const frameFileA = path.join(inputFolder, frames[i]);
       let frameA = fs.readFileSync(frameFileA);
@@ -94,9 +100,19 @@ const run = (inputFolder, outputFolder, url, params) => {
     }
     // retrieve frames list
     const frames = fs.readdirSync(inputFolder);
+    totalFrames = frames.length;
+    const length = Math.ceil(frames.length / numParallel) + 1;
+    const promises = [];
+    while (frames.length) {
+      const slice = frames.splice(0, length);
+      const p = getFlow_(inputFolder, outputFolder, slice, url, params);
+      promises.push(p);
+    }
+
     // infer caption for each frame
     status = 'processing';
-    getFlow_(inputFolder, outputFolder, frames, url, params)
+    // getFlow_(inputFolder, outputFolder, frames, url, params)
+    Promise.all(promises)
         .then(() => compile(inputFolder, outputFolder, params))
         .then(() => {
           status = 'complete';

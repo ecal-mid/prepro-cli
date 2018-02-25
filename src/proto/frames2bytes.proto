@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+// The service definition.
+service Frames2Bytes {
+  rpc Run (Frames2BytesRequest) returns (Frames2BytesReply) {}
+}
+
+// The request message.
+message Frames2BytesRequest {
+  bytes frameA = 1;
+  bytes frameB = 2;
+}
+
+// The response message.
+message Frames2BytesReply {
+  bytes output = 1;
+}

@@ -3,6 +3,8 @@ Maintainer: cyril.diagne [at] ecal.ch
 
 A CLI to run the video preprocessing pipeline of the spring 2018 creative coding course at [ECAL](http://ecal.ch).
 
+![screenshot](https://raw.githubusercontent.com/ecal-mid/prepro-cli/master/medias/prepro-cli.gif)
+
 ### 1 - Install dependencies
 
 Make sure you have installed :

@@ -6,8 +6,6 @@ const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
 
-let outputFolder_;
-
 const _ALL_ERRORS_FATAL = true;
 
 function ensurePath(path) {

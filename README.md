@@ -41,11 +41,15 @@ prepro run <video.mov> <output_folder> [options]
 After the pipeline is complete, the `<output_folder>` will contain the following subfolders:
 ```
 .
-+- audio
-+- colors
-+- frames
-+- openpose
-+- spectrogram
+├── prepros
+|   ├── spectrogram
+|   ├── colors
+|   ├── audio
+|   ├── flow
+|   ├── frames
+|   └── openpose
+├── prepo.json
+└── source.mov
 ```
 
 Available services:
@@ -56,5 +60,5 @@ Available services:
 Services that only work when connected to **ECALNET**:
 - ✓ `audio ➜ spectrogram`
 - ✓ `frames ➜ human pose`
-- ✓ `frames ➜ segmentation masks`
-- ✗ frames ➜ flow (WIP)
+- ✓ `frames ➜ flow`
+- 𐄂 frames ➜ segmentation masks (WIP)

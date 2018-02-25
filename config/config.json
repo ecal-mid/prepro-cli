@@ -23,10 +23,6 @@
     {
       "id": "remote/frames2flow",
       "url": "10.192.250.140:30003"
-    },
-    {
-      "id": "remote/frames2segmentation",
-      "url": "10.192.250.140:30004"
     }
   ]
 }

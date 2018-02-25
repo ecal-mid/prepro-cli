@@ -70,17 +70,17 @@ function run(service, input, outputFolder, cfg) {
   if (service.id == 'video2kfvideo') {
     outputFolder = path.join(outputFolder, '..');
   } else {
-    outputFolder = path.join(outputFolder, service.id);
+    outputFolder = path.join(outputFolder, service.id.split('2').pop());
   }
 
   if (service.id.startsWith('frames2') ||
       service.id.startsWith('remote/frames2')) {
-    input = path.join(outputFolder, '..', 'video2frames');
+    input = path.join(outputFolder, '..', 'frames');
   }
 
   if (service.id.startsWith('audio2') ||
       service.id.startsWith('remote/audio2')) {
-    input = path.join(outputFolder, '..', 'video2audio', 'mono.wav');
+    input = path.join(outputFolder, '..', 'audio', 'mono.wav');
   }
 
   ensurePath(outputFolder);

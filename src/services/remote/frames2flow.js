@@ -100,7 +100,7 @@ const run = (inputFolder, outputFolder, url, params) => {
         .then(() => compile(inputFolder, outputFolder, params))
         .then(() => {
           status = 'complete';
-          resolve(outputFolder);
+          resolve(path.join(outputFolder, 'flow.mov'));
         })
         .catch(reject);
   });

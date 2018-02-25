@@ -30,7 +30,7 @@ const run = (inputFile, output, url, params) => {
     // Load file
     let video = fs.readFileSync(inputFile);
 
-    status = 'running on ' + url;
+    status = 'processing on ' + url;
 
     // Retrieve pose remotely
     /* eslint new-cap: 0 */

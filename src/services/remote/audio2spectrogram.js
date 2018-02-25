@@ -31,7 +31,7 @@ const run = (inputFile, output, url, params) => {
     // Load file
     let audio = fs.readFileSync(inputFile);
 
-    status = 'running on ' + url;
+    status = 'processing on ' + url;
     // Retrieve spectrogram remotely
     /* eslint new-cap: 0 */
     rpc.Run({input: audio}, (err, response) => {

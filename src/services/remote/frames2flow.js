@@ -23,8 +23,6 @@ const getFlow_ = (inputFolder, outputFolder, frames, url, params) => {
   const rpc = new Frames2Bytes(url, grpc.credentials.createInsecure());
 
   return new Promise((resolve, reject) => {
-    resolve();
-    return;
     const getNextFlow = (i) => {
       status = `processing frame ${i + 1}/${frames.length}`;
 

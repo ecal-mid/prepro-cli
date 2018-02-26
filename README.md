@@ -44,12 +44,13 @@ After the pipeline is complete, the `<output_folder>` will contain the following
 ```
 .
 ├── prepros
-|   ├── spectrogram
-|   ├── colors
 |   ├── audio
+|   ├── colors
 |   ├── flow
 |   ├── frames
-|   └── openpose
+|   ├── openpose
+|   ├── segmentation
+|   └── spectrogram
 ├── prepo.json
 └── source.mov
 ```
@@ -63,4 +64,4 @@ Services that only work when connected to **ECALNET**:
 - ✓ `audio ➜ spectrogram`
 - ✓ `frames ➜ human pose`
 - ✓ `frames ➜ flow`
-- 𐄂 frames ➜ segmentation masks (WIP)
+- ✓ `frames ➜ segmentation masks`

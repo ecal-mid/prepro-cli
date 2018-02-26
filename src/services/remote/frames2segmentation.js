@@ -1,11 +1,16 @@
 const fs = require('fs');
 const path = require('path');
 const grpc = require('grpc');
+const {compileFrames} = require('../../utils');
 
 const id = 'frames2segmentation';
 const description = 'Extract mono audio track from video';
 
 let status = 'Idle';
+
+let totalFrames = 0;
+
+const numParallel = 2;
 
 function getStatus() {
   return status;
@@ -23,7 +28,8 @@ const getSegmentations_ = (inputFolder, outputFolder, frames, url, params) => {
 
   return new Promise((resolve, reject) => {
     const getNextSegmentation = (i) => {
-      status = `processing frame ${i + 1}/${frames.length}`;
+      const pct = (i * numParallel) / totalFrames * 100;
+      status = `processing ${pct.toFixed(2)}%`;
 
       const frameFile = path.join(inputFolder, frames[i]);
       let frame = fs.readFileSync(frameFile);
@@ -56,14 +62,36 @@ const run = (inputFolder, outputFolder, url, params) => {
     if (!fs.existsSync(outputFolder)) {
       fs.mkdirSync(outputFolder);
     }
+
     // retrieve frames list
     const frames = fs.readdirSync(inputFolder);
+
+    // run in parallel
+    totalFrames = frames.length;
+    const length = frames.length / numParallel;
+    const promises = [];
+    while (frames.length) {
+      const slice = frames.splice(0, length);
+      if (frames.length) {
+        slice.push(frames[0]);
+      }
+      if (frames.length == 1) {
+        frames.push(frames[0]);
+      }
+      const p =
+          getSegmentations_(inputFolder, outputFolder, slice, url, params);
+      promises.push(p);
+    }
+
+    const output = path.join(outputFolder, 'segmentation.mov');
+
     // infer caption for each frame
-    status = 'processing';
-    getSegmentations_(inputFolder, outputFolder, frames, url, params)
+    status = 'processing on ' + url;
+    Promise.all(promises)
+        .then(() => compileFrames(inputFolder, output, params, 0))
         .then(() => {
           status = 'complete';
-          resolve(outputFolder);
+          resolve(output);
         })
         .catch(reject);
   });

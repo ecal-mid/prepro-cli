@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const grpc = require('grpc');
-const {exec} = require('child_process');
+const {compileFrames} = require('../../utils');
 
 const id = 'frames2flow';
 const description = 'Extract optical flow from video';
@@ -29,7 +29,7 @@ const getFlow_ = (inputFolder, outputFolder, frames, url, params) => {
   return new Promise((resolve, reject) => {
     const getNextFlow = (i) => {
       const pct = (i * numParallel) / totalFrames * 100;
-      status = `processing frames ${pct.toFixed(1)}%`;
+      status = `processing ${pct.toFixed(1)}%`;
 
       const frameFileA = path.join(inputFolder, frames[i]);
       let frameA = fs.readFileSync(frameFileA);
@@ -61,37 +61,6 @@ const getFlow_ = (inputFolder, outputFolder, frames, url, params) => {
   });
 };
 
-const compile = (inputFolder, output, cfg) => {
-  return new Promise((resolve, reject) => {
-    if (!fs.existsSync(output)) {
-      fs.mkdirSync(output);
-    }
-    const cmd = [
-      'ffmpeg',
-      '-loglevel warning',
-      `-r ${cfg.video.framerate}`,
-      `-i ${output}/frame-%03d.png`,
-      '-y',
-      // codec
-      '-c:v libx264',
-      `-vf fps=${cfg.video.framerate}`,
-      `-x264opts keyint=${cfg.video.framerate}`,
-      '-pix_fmt yuv420p',
-      '-vb 20M',
-      // codec options
-      path.join(output, 'flow.mov'),
-    ];
-    exec(cmd.join(' '), (err, stdout, stderr) => {
-      if (err) {
-        status = 'error';
-        reject(err);
-        return;
-      }
-      resolve(output);
-    });
-  });
-};
-
 const run = (inputFolder, outputFolder, url, params) => {
   return new Promise((resolve, reject) => {
     if (!fs.existsSync(outputFolder)) {
@@ -116,12 +85,14 @@ const run = (inputFolder, outputFolder, url, params) => {
 
     // infer caption for each frame
     status = 'processing on ' + url;
-    // getFlow_(inputFolder, outputFolder, frames, url, params)
+
+    const output = path.join(outputFolder, 'flow.mov');
+
     Promise.all(promises)
-        .then(() => compile(inputFolder, outputFolder, params))
+        .then(() => compileFrames(inputFolder, output, params, 0))
         .then(() => {
           status = 'complete';
-          resolve(path.join(outputFolder, 'flow.mov'));
+          resolve(output);
         })
         .catch(reject);
   });

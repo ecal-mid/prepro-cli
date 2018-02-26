@@ -25,7 +25,7 @@ function logStatus(time, services, clear = true) {
   for (let s of services) {
     let status = s.getStatus();
     if (status == 'complete') {
-      status = status.bold.green;
+      status = ('✓ ' + status).bold.green;
     } else if (status.indexOf('processing') != -1) {
       const anim = ['⣷', '⣯', '⣟', '⡿', '⢿', '⣻', '⣽', '⣾'];
       const frame = anim[Math.floor((Date.now()) / 100 % anim.length)];
@@ -36,7 +36,7 @@ function logStatus(time, services, clear = true) {
     let outputName = s.id.split('2').pop();
     outputName = '  ' + outputName.padEnd(14);
     process.stdout.clearLine();
-    process.stdout.write(outputName + status + '\n');
+    process.stdout.write(outputName.grey + status + '\n');
   }
 }
 

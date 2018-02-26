@@ -28,9 +28,8 @@ const getFlow_ = (inputFolder, outputFolder, frames, url, params) => {
 
   return new Promise((resolve, reject) => {
     const getNextFlow = (i) => {
-      const a = i * numParallel;
-      const b = (i + 1) * numParallel;
-      status = `processing frames ${a}-${b}/${totalFrames}`;
+      const pct = (i * numParallel) / totalFrames * 100;
+      status = `processing frames ${pct.toFixed(1)}%`;
 
       const frameFileA = path.join(inputFolder, frames[i]);
       let frameA = fs.readFileSync(frameFileA);
@@ -116,7 +115,7 @@ const run = (inputFolder, outputFolder, url, params) => {
     }
 
     // infer caption for each frame
-    status = 'processing';
+    status = 'processing on ' + url;
     // getFlow_(inputFolder, outputFolder, frames, url, params)
     Promise.all(promises)
         .then(() => compile(inputFolder, outputFolder, params))

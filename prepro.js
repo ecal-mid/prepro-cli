@@ -89,7 +89,7 @@ function run(video, output, cmd) {
       console.error('not supported yet.');
     } else {
       runAll(video, output, cfg)
-          .then((results) => console.log('\n✓  prepro complete!\n'.bold.green))
+          .then((results) => console.log('\nprepro complete!\n'.bold.green))
           .catch((err) => {
             console.error('\n✖ Prepro ERROR\n'.red);
             if (Array.isArray(err)) {

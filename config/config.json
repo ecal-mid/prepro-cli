@@ -27,6 +27,10 @@
     {
       "id": "remote/frames2segmentation",
       "url": "10.192.250.140:30004"
+    },
+    {
+      "id": "remote/frames2sift",
+      "url": "10.192.250.140:30005"
     }
   ]
 }

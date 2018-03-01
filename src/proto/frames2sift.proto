@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+// The service definition.
+service Frames2Sift {
+  rpc Run (Frames2SiftRequest) returns (Frames2SiftReply) {}
+}
+
+// The Point message.
+message Point {
+  float x = 1;
+  float y = 2;
+}
+
+// The Match message.
+message Match {
+  int32 keypointA = 1;
+  int32 keypointB = 2;
+  float distance = 3;
+}
+
+// The request message.
+message Frames2SiftRequest {
+  bytes frameA = 1;
+  bytes frameB = 2;
+}
+
+// The response message.
+message Frames2SiftReply {
+  repeated Point keypointsA = 1;
+  repeated Point keypointsB = 2;
+  repeated Match matches = 3;
+}

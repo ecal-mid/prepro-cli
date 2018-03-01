@@ -2,6 +2,7 @@
 Maintainer: cyril.diagne [at] ecal.ch
 
 A CLI to run the video preprocessing pipeline of the spring 2018 creative coding course at [ECAL](http://ecal.ch).
+It runs the services from [prepro-services](https://github.com/ecal-mid/prepro-services) and saves results that can be loaded directly in [prepro-js](https://github.com/ecal-mid/prepro-js).
 
 ![screenshot](https://raw.githubusercontent.com/ecal-mid/prepro-cli/master/medias/prepro-cli.gif)
 

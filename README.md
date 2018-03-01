@@ -50,6 +50,7 @@ After the pipeline is complete, the `<output_folder>` will contain the following
 |   ├── frames
 |   ├── openpose
 |   ├── segmentation
+|   ├── sift
 |   └── spectrogram
 ├── prepo.json
 └── source.mov
@@ -65,3 +66,4 @@ Services that only work when connected to **ECALNET**:
 - ✓ `frames ➜ human pose`
 - ✓ `frames ➜ flow`
 - ✓ `frames ➜ segmentation masks`
+- ✓ `frames ➜ sift features`

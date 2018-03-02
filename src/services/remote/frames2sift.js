@@ -9,7 +9,7 @@ let status = 'idle';
 
 let totalFrames = 0;
 
-const numParallel = 10;
+const numParallel = 5;
 
 function getStatus() {
   return status;
@@ -36,7 +36,7 @@ const getSift_ = (inputFolder, outputFolder, frames, url, params) => {
       let frameB = fs.readFileSync(frameFileB);
 
       /* eslint new-cap: 0 */
-      rpc.Run({frameA: frameA, frameB: frameB}, (err, response) => {
+      const handler = (err, response) => {
         if (err) {
           reject(err);
           return;
@@ -45,7 +45,7 @@ const getSift_ = (inputFolder, outputFolder, frames, url, params) => {
         const outputFilename =
             path.join(outputFolder, frames[i].split('.').shift() + '.json');
         const file = fs.createWriteStream(outputFilename);
-        file.write(response.output);
+        file.write(JSON.stringify(response));
         file.end();
 
         if (i == frames.length - 2) {
@@ -55,7 +55,13 @@ const getSift_ = (inputFolder, outputFolder, frames, url, params) => {
             getNextSift(++i);
           }, 1000);
         }
-      });
+      };
+      try {
+        rpc.Run({frameA: frameA, frameB: frameB}, handler);
+      } catch (e) {
+        reject(e);
+        return;
+      }
     };
     getNextSift(0);
   });

@@ -2,6 +2,7 @@
 Maintainer: cyril.diagne [at] ecal.ch
 
 A CLI to run the video preprocessing pipeline of the spring 2018 creative coding course at [ECAL](http://ecal.ch).
+It runs the services from [prepro-services](https://github.com/ecal-mid/prepro-services) and saves results that can be loaded directly in [prepro-js](https://github.com/ecal-mid/prepro-js).
 
 ![screenshot](https://raw.githubusercontent.com/ecal-mid/prepro-cli/master/medias/prepro-cli.gif)
 
@@ -50,6 +51,7 @@ After the pipeline is complete, the `<output_folder>` will contain the following
 |   ├── frames
 |   ├── openpose
 |   ├── segmentation
+|   ├── sift
 |   └── spectrogram
 ├── prepo.json
 └── source.mov
@@ -65,3 +67,4 @@ Services that only work when connected to **ECALNET**:
 - ✓ `frames ➜ human pose`
 - ✓ `frames ➜ flow`
 - ✓ `frames ➜ segmentation masks`
+- ✓ `frames ➜ sift features`

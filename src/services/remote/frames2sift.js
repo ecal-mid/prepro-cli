@@ -98,18 +98,16 @@ const run = (inputFolder, outputFolder, url, params) => {
       if (frames.length == 1) {
         frames.push(frames[0]);
       }
-      // const p = getSift_(inputFolder, outputFolder, slice, url, params);
-      // promises.push(p);
+      const p = getSift_(inputFolder, outputFolder, slice, url, params);
+      promises.push(p);
     }
 
-    // infer caption for each frame
     status = 'processing on ' + url;
 
     const output = path.join(outputFolder, 'sift.json');
 
-    // Promise.all(promises)
-    //     .then(() => compile(outputFolder, output))
-    compile(outputFolder, output)
+    Promise.all(promises)
+        .then(() => compile(outputFolder, output))
         .then(() => {
           status = 'complete';
           resolve(output);

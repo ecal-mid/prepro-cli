@@ -36,7 +36,7 @@ function logStatus(time, services, clear = true) {
     let outputName = s.id.split('2').pop();
     outputName = '  ' + outputName.padEnd(14);
     process.stdout.clearLine();
-    process.stdout.write(outputName.grey + status + '\n');
+    process.stdout.write(outputName + status + '\n');
   }
 }
 

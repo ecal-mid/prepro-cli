@@ -31,7 +31,7 @@ program.command('run <video> <output>')
 program.parse(process.argv);
 
 function logVideoInfo(info, format) {
-  const pad = (s) => '  ' + s.padEnd(13).grey;
+  const pad = (s) => '  ' + s.padEnd(13);
   console.log(pad('Format'), format.format_long_name);
   console.log(pad('Size'), info.size.toFixed(2) + 'mb');
   console.log(pad('Width'), info.width + 'px');

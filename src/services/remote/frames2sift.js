@@ -9,7 +9,7 @@ let status = 'idle';
 
 let totalFrames = 0;
 
-const numParallel = 5;
+const numParallel = 10;
 
 function getStatus() {
   return status;
@@ -76,8 +76,18 @@ function compile(folder, outputFile) {
     const results = [];
     for (let jsonFile of files) {
       const filename = path.join(folder, jsonFile);
-      let json = JSON.parse(fs.readFileSync(filename));
-      results.push(json);
+      const content = fs.readFileSync(filename);
+      if (content.length == 0) {
+        reject(new Error(`${filename} is emtpy`));
+        break;
+      }
+      try {
+        const json = JSON.parse(content);
+        results.push(json);
+      } catch (err) {
+        reject(err);
+        break;
+      }
     }
 
     const output = fs.createWriteStream(outputFile);
@@ -114,13 +124,20 @@ const run = (inputFolder, outputFolder, url, params) => {
 
     const output = path.join(outputFolder, 'sift.json');
 
+    if (fs.existsSync(output)) {
+      fs.unlinkSync(output);
+    }
+
     Promise.all(promises)
         .then(() => compile(outputFolder, output))
         .then(() => {
           status = 'complete';
           resolve(output);
         })
-        .catch(reject);
+        .catch((err) => {
+          status = 'error';
+          reject(err);
+        });
   });
 };
 

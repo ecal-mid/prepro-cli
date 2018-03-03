@@ -42,15 +42,13 @@ const getSegmentations_ = (inputFolder, outputFolder, frames, url, params) => {
         }
 
         const outputFilename = path.join(outputFolder, frames[i]);
-        const file = fs.createWriteStream(outputFilename);
-        file.write(response.output);
-        file.end();
-
-        if (i == frames.length - 1) {
-          resolve();
-        } else {
-          getNextSegmentation(++i);
-        }
+        fs.writeFile(outputFilename, response.output, (err) => {
+          if (i == frames.length - 1) {
+            resolve();
+          } else {
+            getNextSegmentation(++i);
+          }
+        });
       });
     };
     getNextSegmentation(0);

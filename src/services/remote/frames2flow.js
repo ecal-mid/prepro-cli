@@ -44,17 +44,15 @@ const getFlow_ = (inputFolder, outputFolder, frames, url, params) => {
         }
 
         const outputFilename = path.join(outputFolder, frames[i]);
-        const file = fs.createWriteStream(outputFilename);
-        file.write(response.output);
-        file.end();
-
-        if (i == frames.length - 2) {
-          resolve();
-        } else {
-          setTimeout(() => {
-            getNextFlow(++i);
-          }, 1000);
-        }
+        fs.writeFile(outputFilename, response.output, (err) => {
+          if (i == frames.length - 2) {
+            resolve();
+          } else {
+            setTimeout(() => {
+              getNextFlow(++i);
+            }, 1000);
+          }
+        });
       });
     };
     getNextFlow(0);

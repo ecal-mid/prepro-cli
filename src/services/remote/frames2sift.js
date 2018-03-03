@@ -44,17 +44,19 @@ const getSift_ = (inputFolder, outputFolder, frames, url, params) => {
 
         const outputFilename =
             path.join(outputFolder, frames[i].split('.').shift() + '.json');
-        const file = fs.createWriteStream(outputFilename);
-        file.write(JSON.stringify(response));
-        file.end();
-
-        if (i == frames.length - 2) {
-          resolve();
-        } else {
-          setTimeout(() => {
-            getNextSift(++i);
-          }, 1000);
-        }
+        const serialized = JSON.stringify(response);
+        fs.writeFile(outputFilename, serialized, (err) => {
+          if (err) {
+            reject(err);
+          }
+          if (i == frames.length - 2) {
+            resolve();
+          } else {
+            setTimeout(() => {
+              getNextSift(++i);
+            }, 1000);
+          }
+        });
       };
       try {
         rpc.Run({frameA: frameA, frameB: frameB}, handler);

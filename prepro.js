@@ -55,7 +55,7 @@ function run(video, output, cmd) {
     throw new Error('File not found ' + path.join(process.cwd(), video).bold);
   }
 
-  console.log('Videos:'.blue.bold);
+  console.log('Video:'.blue.bold);
   console.log('-', `${video}`.bold.underline);
 
   const cfg = config(cmd.config);
@@ -73,13 +73,6 @@ function run(video, output, cmd) {
     };
 
     logVideoInfo(cfg.video, infos.format);
-
-    console.log('Services:'.blue.bold, `(from ${cmd.config})`.grey);
-    for (let service of cfg.services) {
-      console.log(
-          '-', service.id, service.url ? ('> ' + service.url).grey : '');
-    }
-    console.log('');
 
     if (!fs.existsSync(output)) {
       mkdirp.sync(output);

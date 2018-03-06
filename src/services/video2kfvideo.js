@@ -12,7 +12,7 @@ function getStatus() {
 }
 
 const run = (inputFile, output, cfg) => {
-  if (path.basename(output).indexOf('.') == '-1') {
+  if (!path.basename(output).endsWith('.mov')) {
     output = path.join(output, 'source.mov');
   }
   return new Promise((resolve, reject) => {

@@ -61,7 +61,6 @@ function saveInfos(services, cfg) {
     });
   }
 
-  console.log('\nSaving summary to', 'prepro.json'.bold);
   const outputFile = path.join(cfg.outputFolder, 'prepro.json');
   const file = fs.createWriteStream(outputFile);
   file.write(JSON.stringify(cfg.video, null, 2));
@@ -136,7 +135,13 @@ function runAll(inputFile, outputFolder, cfg) {
           }
           const time = Date.now() - startTime;
           clearInterval(updateLoop);
-          logStatus(time, services, true, 1);
+
+          if (cfg.onUpdate) {
+            cfg.onUpdate(time, services);
+          } else {
+            logStatus(time, services, true, 1);
+          }
+
           saveInfos(services, cfg);
           resolve(services);
         })
@@ -148,10 +153,20 @@ function runAll(inputFile, outputFolder, cfg) {
         });
 
     // check updates & global timeout
-    logStatus(0, services, false);
+    if (cfg.onUpdate) {
+      cfg.onUpdate(0, services);
+    } else {
+      logStatus(0, services, false);
+    }
+
     const updateLoop = setInterval(() => {
       const time = Date.now() - startTime;
-      logStatus(time, services);
+
+      if (cfg.onUpdate) {
+        cfg.onUpdate(time, services);
+      } else {
+        logStatus(time, services);
+      }
 
       const pending = services.filter(
           (s) => s.getStatus().indexOf('complete') == -1 &&
@@ -167,7 +182,7 @@ function runAll(inputFile, outputFolder, cfg) {
         clearInterval(updateLoop);
         reject(errors.length ? errors : new Error('Prepro timed out.'));
       }
-    }, 60);
+    }, cfg.updateInterval || 60);
   });
 };
 

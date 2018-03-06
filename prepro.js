@@ -7,7 +7,7 @@ const path = require('path');
 
 const pjson = require('./package.json');
 const config = require('./src/config');
-const {getVideoInfo} = require('./src/utils');
+const {getVideoInfo, logVideoInfo, parseVideoInfo} = require('./src/utils');
 const runAll = require('./src/run_all');
 
 program.version(pjson.version)
@@ -30,18 +30,6 @@ program.command('run <video> <output>')
 
 program.parse(process.argv);
 
-function logVideoInfo(info, format) {
-  const pad = (s) => '  ' + s.padEnd(13);
-  console.log(pad('Format'), format.format_long_name);
-  console.log(pad('Size'), info.size.toFixed(2) + 'mb');
-  console.log(pad('Width'), info.width + 'px');
-  console.log(pad('Height'), info.height + 'px');
-  console.log(pad('Duration'), info.duration.toFixed(2) + 's');
-  console.log(pad('Framerate'), info.framerate.toFixed(2) + 'fps');
-  console.log(pad('Total frames'), info.totalframes + '');
-  console.log('');
-}
-
 function run(video, output, cmd) {
   console.log('');
   for (let l
@@ -61,17 +49,7 @@ function run(video, output, cmd) {
   const cfg = config(cmd.config);
 
   getVideoInfo(video).then((infos) => {
-    const videoInfos = infos.streams.filter((f) => f.codec_type == 'video');
-    cfg.video = {
-      duration: parseFloat(videoInfos[0]['duration']),
-      framerate: parseFloat(videoInfos[0]['r_frame_rate']),
-      totalframes: parseInt(videoInfos[0]['nb_frames']),
-      width: parseInt(videoInfos[0]['width']),
-      height: parseInt(videoInfos[0]['height']),
-      size: infos.format.size / (1024 * 1024),
-      services: [],
-    };
-
+    cfg.video = parseVideoInfo(infos);
     logVideoInfo(cfg.video, infos.format);
 
     if (!fs.existsSync(output)) {

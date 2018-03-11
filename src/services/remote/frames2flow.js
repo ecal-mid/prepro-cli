@@ -59,6 +59,20 @@ const getFlow_ = (inputFolder, outputFolder, frames, url, params) => {
   });
 };
 
+function cleanup(folder, files) {
+  return new Promise((resolve, reject) => {
+    try {
+      for (let f of files) {
+        const p = path.join(folder, f);
+        fs.unlinkSync(p);
+      }
+    } catch (err) {
+      reject(err);
+    }
+    resolve();
+  });
+}
+
 const run = (inputFolder, outputFolder, url, params) => {
   return new Promise((resolve, reject) => {
     if (!fs.existsSync(outputFolder)) {
@@ -66,6 +80,7 @@ const run = (inputFolder, outputFolder, url, params) => {
     }
     // retrieve frames list
     const frames = fs.readdirSync(inputFolder);
+
     totalFrames = frames.length;
     const length = frames.length / numParallel;
     const promises = [];
@@ -88,6 +103,11 @@ const run = (inputFolder, outputFolder, url, params) => {
 
     Promise.all(promises)
         .then(() => compileFrames(inputFolder, output, params, 0))
+        .then(() => {
+          const files = fs.readdirSync(outputFolder)
+                            .filter((f) => path.extname(f) == '.png');
+          return cleanup(outputFolder, files);
+        })
         .then(() => {
           status = 'complete';
           resolve(output);

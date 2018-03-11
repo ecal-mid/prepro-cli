@@ -94,6 +94,12 @@ function compile(folder, outputFile) {
     output.write(JSON.stringify(results, null, 2));
     output.end();
 
+    // cleanup
+    for (let f of files) {
+      const p = path.join(folder, f);
+      fs.unlinkSync(p);
+    }
+
     resolve();
   });
 }

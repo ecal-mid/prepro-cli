@@ -22,7 +22,7 @@ const run = (inputFile, output, cfg) => {
       '-loglevel warning',
       `-i ${inputFile}`,
       `-r ${cfg.video.framerate}`,
-      path.join(output, 'frame-%03d.png'),
+      path.join(output, 'frame-%04d.png'),
     ];
     status = 'processing';
     exec(cmd.join(' '), (err, stdout, stderr) => {

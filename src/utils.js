@@ -52,7 +52,7 @@ const compileFrames = (inputFolder, output, cfg, quality) => {
       'ffmpeg',
       '-loglevel warning',
       `-r ${cfg.video.framerate}`,
-      `-i ${path.dirname(output)}/frame-%03d.png`,
+      `-i ${path.dirname(output)}/frame-%04d.png`,
       '-y',
       // codec
       '-c:v libx264',

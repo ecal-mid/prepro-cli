@@ -25,7 +25,10 @@ const run = (inputFile, output, url, params) => {
     const Bytes2Text = proto.Bytes2Text;
 
     // Create stub
-    const rpc = new Bytes2Text(url, grpc.credentials.createInsecure());
+    const rpc = new Bytes2Text(url, grpc.credentials.createInsecure(), {
+      'grpc.max_send_message_length': 100 * 1024 * 1024,
+      'grpc.max_receive_message_length': 100 * 1024 * 1024,
+    });
 
     // Load file
     let video = fs.readFileSync(inputFile);
@@ -36,10 +39,9 @@ const run = (inputFile, output, url, params) => {
     /* eslint new-cap: 0 */
     rpc.Run({input: video}, (err, response) => {
       if (err) {
-        status = 'error';
         rpc.close();
+        status = 'error';
         reject(err);
-        return;
       }
 
       // Save file
@@ -48,6 +50,7 @@ const run = (inputFile, output, url, params) => {
         file.write(response.output);
         file.end();
       } catch (err) {
+        status = 'error';
         reject(err);
       }
 

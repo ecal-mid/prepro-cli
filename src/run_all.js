@@ -5,8 +5,9 @@ const colors = require('colors');
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
+const sharp = require('sharp');
 
-const _ALL_ERRORS_FATAL = true;
+const _ALL_ERRORS_FATAL = false;
 
 function ensurePath(path) {
   if (!fs.existsSync(path)) {
@@ -41,30 +42,52 @@ function logStatus(time, services, clear = true) {
 }
 
 function saveInfos(services, cfg) {
-  for (let s of services) {
-    // determine type of output
-    let type;
-    if (s.output.indexOf('.') == -1) {
-      ensurePath(s.output);
-      type = 'frames';
-    } else {
-      const folder = s.output.split('/');
-      folder.pop();
-      ensurePath(path.join.apply(null, folder));
-      type = s.output.split('.').pop();
-    }
-    // save infos
-    cfg.video.services.push({
-      'name': s.id,
-      'path': path.relative(cfg.outputFolder, s.output),
-      'type': type,
-    });
-  }
+  return new Promise((resolve, reject) => {
+    // Save prepro.json
+    try {
+      for (let s of services) {
+        if (!s.output) {
+          continue;
+        }
+        // determine type of output
+        let type;
+        if (s.output.indexOf('.') == -1) {
+          ensurePath(s.output);
+          type = 'frames';
+        } else {
+          const folder = s.output.split('/');
+          folder.pop();
+          ensurePath(path.join.apply(null, folder));
+          type = s.output.split('.').pop();
+        }
+        // save infos
+        cfg.video.services.push({
+          'name': s.id,
+          'path': path.relative(cfg.outputFolder, s.output),
+          'type': type,
+        });
+      }
+      const outputFile = path.join(cfg.outputFolder, 'prepro.json');
+      const file = fs.createWriteStream(outputFile);
+      file.write(JSON.stringify(cfg.video, null, 2));
+      file.end();
 
-  const outputFile = path.join(cfg.outputFolder, 'prepro.json');
-  const file = fs.createWriteStream(outputFile);
-  file.write(JSON.stringify(cfg.video, null, 2));
-  file.end();
+      // save thumbnail
+      const frame1 =
+          path.join(cfg.outputFolder, 'prepros', 'frames', 'frame-0001.png');
+      const thumbnail = path.join(cfg.outputFolder, 'prepros', 'thumbnail.jpg');
+      getThumbnail(frame1, thumbnail, 300)
+          .then(() => resolve())
+          .catch((err) => reject(err));
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+function getThumbnail(inputFile, outputFile, size) {
+  const bmp = fs.readFileSync(inputFile);
+  return sharp(bmp).resize(size).toFile(outputFile);
 }
 
 function run(service, input, outputFolder, cfg) {
@@ -118,32 +141,42 @@ function runAll(inputFile, outputFolder, cfg) {
     const errors = [];
 
     let services2;
-
+    let promises2;
     Promise.all(promises1)
         .then((outputs) => {
           for (let i = 0; i < outputs.length; i++) {
             services1[i].output = outputs[i];
           }
           services2 = services.filter((s) => dependencies.indexOf(s.id) == -1);
-          const promises2 =
+          promises2 =
               services2.map((s) => run(s, inputFile, servicesFolder, cfg));
-          return Promise.all(promises2);
+          return settle(promises2);
         })
         .then((outputs) => {
+          // compile results
           for (let i = 0; i < outputs.length; i++) {
-            services2[i].output = outputs[i];
+            if (outputs[i].state === 'rejected') {
+              errors.push(outputs[i].value);
+            } else {
+              services2[i].output = outputs[i].value;
+            }
           }
           const time = Date.now() - startTime;
           clearInterval(updateLoop);
-
           if (cfg.onUpdate) {
             cfg.onUpdate(time, services);
           } else {
             logStatus(time, services, true, 1);
           }
 
-          saveInfos(services, cfg);
-          resolve(services);
+          return saveInfos(services, cfg);
+        })
+        .then(() => {
+          if (errors.length) {
+            reject({services: services, services_error: errors});
+          } else {
+            resolve(services);
+          }
         })
         .catch((err) => {
           if (_ALL_ERRORS_FATAL) {
@@ -168,13 +201,16 @@ function runAll(inputFile, outputFolder, cfg) {
         logStatus(time, services);
       }
 
+      // If all services are either complete or error and the updateLoop
+      // is still running, it means the pipeline is complete with errors.
       const pending = services.filter(
           (s) => s.getStatus().indexOf('complete') == -1 &&
               s.getStatus().indexOf('error') == -1);
-
       if (pending.length == 0) {
         clearInterval(updateLoop);
-        reject(errors);
+        saveInfos(services, cfg).then(() => {
+          reject({services_error: errors});
+        });
         return;
       }
 
@@ -185,5 +221,13 @@ function runAll(inputFile, outputFolder, cfg) {
     }, cfg.updateInterval || 60);
   });
 };
+
+function settle(arr) {
+  return Promise.all(arr.map((promise) => {
+    return promise.then(
+        (value) => ({state: 'fullfilled', value}),
+        (value) => ({state: 'rejected', value}));
+  }));
+}
 
 module.exports = runAll;

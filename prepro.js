@@ -62,19 +62,24 @@ function run(video, output, cmd) {
       runAll(video, output, cfg)
           .then((results) => console.log('\nprepro complete!\n'.bold.green))
           .catch((err) => {
-            console.error('\n✖ Prepro ERROR\n'.red);
-            if (Array.isArray(err)) {
-              for (e of err) {
+            if (err.services_error) {
+              console.error(
+                  '\nDone.',
+                  '\n⚠  But at least 1 service could not complete:\n'.yellow);
+              for (e of err.services_error) {
                 if (e.stack) {
-                  console.error(e.stack.red, '\n');
+                  console.error(e.stack.yellow, '\n');
                 } else {
-                  console.error(e.red, '\n');
+                  console.error(e.yellow, '\n');
                 }
               }
-            } else if (err.stack) {
-              console.error(err.stack.red, '\n');
             } else {
-              console.error(err.red, '\n');
+              console.error('\n✖ Prepro ERROR\n'.yellow);
+              if (err.stack) {
+                console.error(err.stack.red, '\n');
+              } else {
+                console.error(err.red, '\n');
+              }
             }
             process.exit(1);
           });

@@ -1,6 +1,6 @@
 {
   "name": "prepro",
-  "version": "0.0.1",
+  "version": "0.0.11",
   "description": "CLI for prepro",
   "preferGlobal": true,
   "bin": "./src/prepro.js",

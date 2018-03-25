@@ -25,7 +25,7 @@ const parseVideoInfo = (infos) => {
   const videoInfos = infos.streams.filter((f) => f.codec_type == 'video');
   return {
     duration: parseFloat(videoInfos[0]['duration']),
-    framerate: parseFloat(videoInfos[0]['r_frame_rate']),
+    framerate: parseFloat(eval(videoInfos[0]['r_frame_rate'])),
     totalframes: parseInt(videoInfos[0]['nb_frames']),
     width: parseInt(videoInfos[0]['width']),
     height: parseInt(videoInfos[0]['height']),

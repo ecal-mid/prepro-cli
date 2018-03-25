@@ -24,7 +24,7 @@ const run = (inputFile, output, cfg) => {
       // codec
       '-c:v libx264',
       // codec options
-      `-x264opts keyint=${cfg.video.framerate}`,
+      `-x264opts keyint=${Math.round(cfg.video.framerate)}`,
       output,
     ];
     status = 'processing';

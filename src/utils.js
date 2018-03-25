@@ -5,7 +5,7 @@ const getVideoInfo = (inputFile) => {
   return new Promise((resolve, reject) => {
     const cmd = [
       'ffprobe',
-      `-i ${inputFile}`,
+      `-i "${inputFile}"`,
       '-print_format json',
       '-show_format',
       '-show_streams',

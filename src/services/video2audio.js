@@ -18,7 +18,7 @@ const run = (inputFile, output, cfg) => {
   return new Promise((resolve, reject) => {
     const cmd = [
       'ffmpeg',
-      `-i ${inputFile}`,
+      `-i "${inputFile}"`,
       // allow overwrite
       '-y',
       // combine to mono channel

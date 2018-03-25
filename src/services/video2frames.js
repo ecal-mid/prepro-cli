@@ -20,7 +20,7 @@ const run = (inputFile, output, cfg) => {
     const cmd = [
       'ffmpeg',
       '-loglevel warning',
-      `-i ${inputFile}`,
+      `-i "${inputFile}"`,
       `-r ${cfg.video.framerate}`,
       path.join(output, 'frame-%04d.png'),
     ];

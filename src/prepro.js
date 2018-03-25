@@ -5,10 +5,10 @@ const fs = require('fs');
 const mkdirp = require('mkdirp');
 const path = require('path');
 
-const pjson = require('./package.json');
-const config = require('./src/config');
-const {getVideoInfo, logVideoInfo, parseVideoInfo} = require('./src/utils');
-const runAll = require('./src/run_all');
+const pjson = require('../package.json');
+const config = require('./config');
+const {getVideoInfo, logVideoInfo, parseVideoInfo} = require('./utils');
+const runAll = require('./run_all');
 
 program.version(pjson.version)
     .description('Prepro CLI for ECAL Creative Coding course');

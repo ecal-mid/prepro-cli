@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+// The service definition.
+service Bytes2Features {
+  rpc Run (Bytes2FeaturesRequest) returns (Bytes2FeaturesReply) {}
+}
+
+// The request message.
+message Bytes2FeaturesRequest {
+  bytes input = 1;
+}
+
+// The response message.
+message Bytes2FeaturesReply {
+  repeated float features = 1;
+}

@@ -37,6 +37,10 @@
       "url": "10.192.155.08:30006"
     },
     {
+      "id": "remote/frames2features",
+      "url": "10.192.155.08:30007"
+    },
+    {
       "id": "remote/frames2detection",
       "url": "10.192.155.08:30008"
     }

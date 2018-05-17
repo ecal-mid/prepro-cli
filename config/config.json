@@ -35,6 +35,10 @@
     {
       "id": "remote/frames2depth",
       "url": "10.192.155.08:30006"
+    },
+    {
+      "id": "remote/frames2detection",
+      "url": "10.192.155.08:30008"
     }
   ]
 }

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+// The service definition.
+service Bytes2Boxes {
+  rpc Run (Bytes2BoxesRequest) returns (Bytes2BoxesReply) {}
+}
+
+// The request message.
+message Bytes2BoxesRequest {
+  bytes input = 1;
+}
+
+message DetectionBox {
+  string category = 1;
+  float score = 2;
+  float x = 3;
+  float y = 4;
+  float width = 5;
+  float height = 6;
+}
+
+// The response message.
+message Bytes2BoxesReply {
+  repeated DetectionBox detections = 1;
+}

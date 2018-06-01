@@ -57,7 +57,7 @@ const compileFrames = (inputFolder, output, cfg, quality) => {
       // codec
       '-c:v libx264',
       `-vf fps=${cfg.video.framerate}`,
-      `-x264opts keyint=${cfg.video.framerate}`,
+      `-x264opts keyint=${Math.round(cfg.video.framerate)}`,
       '-pix_fmt yuv420p',
       `-crf ${quality}`,
       // codec options

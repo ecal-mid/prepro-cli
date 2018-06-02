@@ -6,7 +6,7 @@ const {compileFrames} = require('../../utils');
 const id = 'frames2segmentation';
 const description = 'Extract mono audio track from video';
 
-let status = 'Idle';
+let status = 'idle';
 
 let totalFrames = 0;
 

@@ -5,7 +5,7 @@ const grpc = require('grpc');
 const id = 'frames2features';
 const description = 'Retrieve frames feature vectors';
 
-let status = 'Idle';
+let status = 'idle';
 
 let totalFrames = 0;
 

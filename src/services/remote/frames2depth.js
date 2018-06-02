@@ -6,7 +6,7 @@ const {compileFrames} = require('../../utils');
 const id = 'frames2depth';
 const description = 'Infer depth maps from video frames';
 
-let status = 'Idle';
+let status = 'idle';
 
 let totalFrames = 0;
 

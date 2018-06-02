@@ -5,7 +5,7 @@ const grpc = require('grpc');
 const id = 'frames2detection';
 const description = 'Detect object in video frames';
 
-let status = 'Idle';
+let status = 'idle';
 
 let totalFrames = 0;
 

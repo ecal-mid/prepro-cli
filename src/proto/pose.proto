@@ -1,0 +1,25 @@
+syntax="proto3";
+
+enum PoseType {
+	POSE_TYPE_OPENPOSE_FULL = 0;
+}
+
+message PoseSequence {
+  repeated PoseFrame poses = 1;
+}
+
+message PoseFrame {
+	int32 id = 1;
+  repeated Pose poses = 2;
+}
+
+message Pose {
+	int32 id = 1;
+	PoseType type = 2;
+  repeated Point points = 3;
+}
+
+message Point {
+	float x = 1;
+	float y = 2;
+}

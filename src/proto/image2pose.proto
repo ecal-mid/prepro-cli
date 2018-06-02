@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+import "pose.proto";
+
+service Image2Pose {
+  rpc Run (Image2PoseRequest) returns (Image2PoseReply) {}
+}
+
+// The request message.
+message Image2PoseRequest {
+  bytes image = 1;
+}
+
+// The response message.
+message Image2PoseReply {
+  PoseFrame result = 1;
+}
